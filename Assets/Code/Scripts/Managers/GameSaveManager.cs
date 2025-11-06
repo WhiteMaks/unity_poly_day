@@ -1,11 +1,11 @@
-using System;
 using System.Collections;
+using Code.Scripts.Wrappers;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace Code.Scripts.Managers
 {
-	public class GameSaveManager : MonoBehaviour
+	public class GameSaveManager : BaseMonoBehaviour
 	{
 		private static GameSaveManager _instance;
 
@@ -16,7 +16,7 @@ namespace Code.Scripts.Managers
 			return _instance;
 		}
 
-		private void Awake()
+		protected override void Awake()
 		{
 			if (_instance == null)
 			{
@@ -27,7 +27,7 @@ namespace Code.Scripts.Managers
 			Destroy(gameObject);
 		}
 
-		private void Start()
+		protected override void Start()
 		{
 			DontDestroyOnLoad(gameObject);
 		}
@@ -37,6 +37,11 @@ namespace Code.Scripts.Managers
 			var loadOperation = SceneManager.LoadSceneAsync(worldSceneIndex);
 
 			yield return null;
+		}
+
+		public byte GetWorldSceneIndex()
+		{
+			return worldSceneIndex;
 		}
 
 	}

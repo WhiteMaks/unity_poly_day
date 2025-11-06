@@ -1,10 +1,13 @@
-using Code.Scripts.Providers;
+using Code.Scripts.Managers.Player;
+using Code.Scripts.Wrappers;
 using UnityEngine;
 
-namespace Code.Scripts.Controllers
+namespace Code.Scripts.Managers
 {
-	public class CameraController : MonoBehaviour
+	public class CameraManager : BaseMonoBehaviour
 	{
+		private static CameraManager _instance;
+
 		[SerializeField] private Transform target;
 
 		[SerializeField] private float xAngle;
@@ -13,23 +16,39 @@ namespace Code.Scripts.Controllers
 		[SerializeField] private float rotationSpeed;
 		[SerializeField] private float rotationSmoothTime;
 
-		private IInputProvider _inputProvider;
+		private PlayerInputManager _playerInputManager;
 
 		private float _yAngle;
 		private float _currentRotationSpeed;
 		private float _rotationVelocity;
 
-		private void Awake()
+		public static CameraManager GetInstance()
 		{
-			_inputProvider = GetComponent<IInputProvider>();
+			return _instance;
 		}
 
-		private void Update()
+		protected override void Awake()
+		{
+			if (_instance == null)
+			{
+				_instance = this;
+				return;
+			}
+
+			Destroy(gameObject);
+		}
+
+		protected override void Start()
+		{
+			_playerInputManager = PlayerInputManager.GetInstance();
+		}
+
+		protected override void Update()
 		{
 			UpdateRotationByInput();
 		}
 
-		private void LateUpdate()
+		protected override void LateUpdate()
 		{
 			UpdatePosition();
 			UpdateView();
@@ -37,7 +56,7 @@ namespace Code.Scripts.Controllers
 
 		private void UpdateRotationByInput()
 		{
-			var rotationInput = _inputProvider.GetCameraRotation();
+			var rotationInput = _playerInputManager.GetCameraRotation();
 
 			var targetRotationSpeed = rotationInput * rotationSpeed;
 

@@ -1,8 +1,8 @@
-using UnityEngine;
+using Code.Scripts.Wrappers;
 
 namespace Code.Scripts.Managers
 {
-	public class MainMenuManager : MonoBehaviour
+	public class MainMenuManager : BaseMonoBehaviour
 	{
 
 		public void ClickOnStartNewGameButton()

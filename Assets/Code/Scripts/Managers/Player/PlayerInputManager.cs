@@ -1,16 +1,24 @@
+using Code.Scripts.Wrappers;
 using UnityEngine;
 
-namespace Code.Scripts.Providers
+namespace Code.Scripts.Managers.Player
 {
-	public class PlayerInputProvider : MonoBehaviour, IInputProvider
+	public class PlayerInputManager : BaseMonoBehaviour
 	{
+		private static PlayerInputManager _instance;
+
 		private InputSystem _inputSystem;
 
 		private Vector2 _playerMovement;
 
 		private float _cameraRotation;
 
-		private void OnEnable()
+		public static PlayerInputManager GetInstance()
+		{
+			return _instance;
+		}
+
+		protected override void OnEnable()
 		{
 			if (_inputSystem == null)
 			{
@@ -25,9 +33,37 @@ namespace Code.Scripts.Providers
 			_inputSystem.Enable();
 		}
 
-		private void OnDisable()
+		protected override void Awake()
+		{
+			if (_instance == null)
+			{
+				_instance = this;
+				return;
+			}
+
+			Destroy(gameObject);
+		}
+
+		protected override void OnDisable()
 		{
 			_inputSystem.Disable();
+		}
+
+		protected override void OnApplicationFocus(bool hasFocus)
+		{
+			if (!enabled)
+			{
+				return;
+			}
+
+			if (hasFocus)
+			{
+				_inputSystem.Enable();
+			}
+			else
+			{
+				_inputSystem.Disable();
+			}
 		}
 
 		public Vector2 GetPlayerMovement()
