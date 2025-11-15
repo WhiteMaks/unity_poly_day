@@ -17,7 +17,7 @@ namespace Code.Scripts.Managers.Player
 		{
 			base.Update();
 
-			_locomotionManager.HandleAllMovement();
+			_locomotionManager.HandleMovement();
 		}
 	}
 }

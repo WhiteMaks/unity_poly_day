@@ -7,7 +7,7 @@ namespace Code.Scripts.Managers
 
 		public void ClickOnStartNewGameButton()
 		{
-			StartCoroutine(GameSaveManager.GetInstance().StartNewGame());
+			StartCoroutine(GameSaveManager.GetInstance().NewGame());
 		}
 
 	}

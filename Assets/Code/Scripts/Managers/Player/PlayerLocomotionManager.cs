@@ -1,3 +1,4 @@
+using Code.Scripts.Entities;
 using Code.Scripts.Managers.Character;
 using UnityEngine;
 
@@ -9,8 +10,8 @@ namespace Code.Scripts.Managers.Player
 		[SerializeField] private float rotationSpeed;
 
 		private PlayerManager _playerManager;
-		private CameraManager _cameraManager;
 		private PlayerInputManager _playerInputManager;
+		private MobaCamera _mobaCamera;
 
 		private Vector3 _moveDirection;
 		private Vector3 _rotationDirection;
@@ -18,11 +19,12 @@ namespace Code.Scripts.Managers.Player
 		private float _horizontalMovement;
 		private float _verticalMovement;
 
-		public void HandleAllMovement()
+		public void HandleMovement()
 		{
-			HandleInputMovement();
-			HandleGroundedMovement();
-			HandleViewRotation();
+			HandleInput();
+
+			UpdatePosition();
+			UpdateRotation();
 		}
 
 		protected override void Awake()
@@ -34,14 +36,14 @@ namespace Code.Scripts.Managers.Player
 
 		protected override void Start()
 		{
-			_cameraManager = CameraManager.GetInstance();
 			_playerInputManager = PlayerInputManager.GetInstance();
+			_mobaCamera = MobaCamera.GetInstance();
 		}
 
-		private void HandleGroundedMovement()
+		private void UpdatePosition()
 		{
-			_moveDirection = _cameraManager.transform.forward * _verticalMovement;
-			_moveDirection += _cameraManager.transform.right * _horizontalMovement;
+			_moveDirection = _mobaCamera.transform.forward * _verticalMovement;
+			_moveDirection += _mobaCamera.transform.right * _horizontalMovement;
 
 			_moveDirection.Normalize();
 			_moveDirection.y = 0;
@@ -49,7 +51,7 @@ namespace Code.Scripts.Managers.Player
 			_playerManager.GetCharacterController().Move(_moveDirection * (movementSpeed * Time.deltaTime));
 		}
 
-		private void HandleInputMovement()
+		private void HandleInput()
 		{
 			var movement = _playerInputManager.GetPlayerMovement();
 
@@ -57,10 +59,10 @@ namespace Code.Scripts.Managers.Player
 			_verticalMovement = movement.y;
 		}
 
-		private void HandleViewRotation()
+		private void UpdateRotation()
 		{
-			_rotationDirection = _cameraManager.transform.forward * _verticalMovement;
-			_rotationDirection += _cameraManager.transform.right * _horizontalMovement;
+			_rotationDirection = _mobaCamera.transform.forward * _verticalMovement;
+			_rotationDirection += _mobaCamera.transform.right * _horizontalMovement;
 
 			_rotationDirection.Normalize();
 			_rotationDirection.y = 0;

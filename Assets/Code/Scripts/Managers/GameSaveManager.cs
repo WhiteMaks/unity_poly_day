@@ -32,7 +32,7 @@ namespace Code.Scripts.Managers
 			DontDestroyOnLoad(gameObject);
 		}
 
-		public IEnumerator StartNewGame()
+		public IEnumerator NewGame()
 		{
 			var loadOperation = SceneManager.LoadSceneAsync(worldSceneIndex);
 
