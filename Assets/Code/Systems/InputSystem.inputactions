@@ -3,7 +3,7 @@
     "name": "InputSystem",
     "maps": [
         {
-            "name": "Player Movement",
+            "name": "Player",
             "id": "9c6dbde7-2091-44a8-993a-d5b7b381619b",
             "actions": [
                 {
@@ -75,7 +75,7 @@
             ]
         },
         {
-            "name": "Camera Movement",
+            "name": "Camera",
             "id": "a9b53460-35f5-4630-85c6-b9f1337feffa",
             "actions": [
                 {

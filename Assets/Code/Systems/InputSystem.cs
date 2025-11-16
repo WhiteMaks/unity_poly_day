@@ -89,7 +89,7 @@ public partial class @InputSystem: IInputActionCollection2, IDisposable
     ""name"": ""InputSystem"",
     ""maps"": [
         {
-            ""name"": ""Player Movement"",
+            ""name"": ""Player"",
             ""id"": ""9c6dbde7-2091-44a8-993a-d5b7b381619b"",
             ""actions"": [
                 {
@@ -161,7 +161,7 @@ public partial class @InputSystem: IInputActionCollection2, IDisposable
             ]
         },
         {
-            ""name"": ""Camera Movement"",
+            ""name"": ""Camera"",
             ""id"": ""a9b53460-35f5-4630-85c6-b9f1337feffa"",
             ""actions"": [
                 {
@@ -213,18 +213,18 @@ public partial class @InputSystem: IInputActionCollection2, IDisposable
     ],
     ""controlSchemes"": []
 }");
-        // Player Movement
-        m_PlayerMovement = asset.FindActionMap("Player Movement", throwIfNotFound: true);
-        m_PlayerMovement_Movement = m_PlayerMovement.FindAction("Movement", throwIfNotFound: true);
-        // Camera Movement
-        m_CameraMovement = asset.FindActionMap("Camera Movement", throwIfNotFound: true);
-        m_CameraMovement_Rotation = m_CameraMovement.FindAction("Rotation", throwIfNotFound: true);
+        // Player
+        m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
+        m_Player_Movement = m_Player.FindAction("Movement", throwIfNotFound: true);
+        // Camera
+        m_Camera = asset.FindActionMap("Camera", throwIfNotFound: true);
+        m_Camera_Rotation = m_Camera.FindAction("Rotation", throwIfNotFound: true);
     }
 
     ~@InputSystem()
     {
-        UnityEngine.Debug.Assert(!m_PlayerMovement.enabled, "This will cause a leak and performance issues, InputSystem.PlayerMovement.Disable() has not been called.");
-        UnityEngine.Debug.Assert(!m_CameraMovement.enabled, "This will cause a leak and performance issues, InputSystem.CameraMovement.Disable() has not been called.");
+        UnityEngine.Debug.Assert(!m_Player.enabled, "This will cause a leak and performance issues, InputSystem.Player.Disable() has not been called.");
+        UnityEngine.Debug.Assert(!m_Camera.enabled, "This will cause a leak and performance issues, InputSystem.Camera.Disable() has not been called.");
     }
 
     /// <summary>
@@ -297,29 +297,29 @@ public partial class @InputSystem: IInputActionCollection2, IDisposable
         return asset.FindBinding(bindingMask, out action);
     }
 
-    // Player Movement
-    private readonly InputActionMap m_PlayerMovement;
-    private List<IPlayerMovementActions> m_PlayerMovementActionsCallbackInterfaces = new List<IPlayerMovementActions>();
-    private readonly InputAction m_PlayerMovement_Movement;
+    // Player
+    private readonly InputActionMap m_Player;
+    private List<IPlayerActions> m_PlayerActionsCallbackInterfaces = new List<IPlayerActions>();
+    private readonly InputAction m_Player_Movement;
     /// <summary>
-    /// Provides access to input actions defined in input action map "Player Movement".
+    /// Provides access to input actions defined in input action map "Player".
     /// </summary>
-    public struct PlayerMovementActions
+    public struct PlayerActions
     {
         private @InputSystem m_Wrapper;
 
         /// <summary>
         /// Construct a new instance of the input action map wrapper class.
         /// </summary>
-        public PlayerMovementActions(@InputSystem wrapper) { m_Wrapper = wrapper; }
+        public PlayerActions(@InputSystem wrapper) { m_Wrapper = wrapper; }
         /// <summary>
-        /// Provides access to the underlying input action "PlayerMovement/Movement".
+        /// Provides access to the underlying input action "Player/Movement".
         /// </summary>
-        public InputAction @Movement => m_Wrapper.m_PlayerMovement_Movement;
+        public InputAction @Movement => m_Wrapper.m_Player_Movement;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
-        public InputActionMap Get() { return m_Wrapper.m_PlayerMovement; }
+        public InputActionMap Get() { return m_Wrapper.m_Player; }
         /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
         public void Enable() { Get().Enable(); }
         /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Disable()" />
@@ -327,9 +327,9 @@ public partial class @InputSystem: IInputActionCollection2, IDisposable
         /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
         public bool enabled => Get().enabled;
         /// <summary>
-        /// Implicitly converts an <see ref="PlayerMovementActions" /> to an <see ref="InputActionMap" /> instance.
+        /// Implicitly converts an <see ref="PlayerActions" /> to an <see ref="InputActionMap" /> instance.
         /// </summary>
-        public static implicit operator InputActionMap(PlayerMovementActions set) { return set.Get(); }
+        public static implicit operator InputActionMap(PlayerActions set) { return set.Get(); }
         /// <summary>
         /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
         /// </summary>
@@ -337,11 +337,11 @@ public partial class @InputSystem: IInputActionCollection2, IDisposable
         /// <remarks>
         /// If <paramref name="instance" /> is <c>null</c> or <paramref name="instance"/> have already been added this method does nothing.
         /// </remarks>
-        /// <seealso cref="PlayerMovementActions" />
-        public void AddCallbacks(IPlayerMovementActions instance)
+        /// <seealso cref="PlayerActions" />
+        public void AddCallbacks(IPlayerActions instance)
         {
-            if (instance == null || m_Wrapper.m_PlayerMovementActionsCallbackInterfaces.Contains(instance)) return;
-            m_Wrapper.m_PlayerMovementActionsCallbackInterfaces.Add(instance);
+            if (instance == null || m_Wrapper.m_PlayerActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_PlayerActionsCallbackInterfaces.Add(instance);
             @Movement.started += instance.OnMovement;
             @Movement.performed += instance.OnMovement;
             @Movement.canceled += instance.OnMovement;
@@ -353,8 +353,8 @@ public partial class @InputSystem: IInputActionCollection2, IDisposable
         /// <remarks>
         /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
         /// </remarks>
-        /// <seealso cref="PlayerMovementActions" />
-        private void UnregisterCallbacks(IPlayerMovementActions instance)
+        /// <seealso cref="PlayerActions" />
+        private void UnregisterCallbacks(IPlayerActions instance)
         {
             @Movement.started -= instance.OnMovement;
             @Movement.performed -= instance.OnMovement;
@@ -362,12 +362,12 @@ public partial class @InputSystem: IInputActionCollection2, IDisposable
         }
 
         /// <summary>
-        /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="PlayerMovementActions.UnregisterCallbacks(IPlayerMovementActions)" />.
+        /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="PlayerActions.UnregisterCallbacks(IPlayerActions)" />.
         /// </summary>
-        /// <seealso cref="PlayerMovementActions.UnregisterCallbacks(IPlayerMovementActions)" />
-        public void RemoveCallbacks(IPlayerMovementActions instance)
+        /// <seealso cref="PlayerActions.UnregisterCallbacks(IPlayerActions)" />
+        public void RemoveCallbacks(IPlayerActions instance)
         {
-            if (m_Wrapper.m_PlayerMovementActionsCallbackInterfaces.Remove(instance))
+            if (m_Wrapper.m_PlayerActionsCallbackInterfaces.Remove(instance))
                 UnregisterCallbacks(instance);
         }
 
@@ -377,45 +377,45 @@ public partial class @InputSystem: IInputActionCollection2, IDisposable
         /// <remarks>
         /// If <paramref name="instance" /> is <c>null</c>, calling this method will only unregister all existing callbacks but not register any new callbacks.
         /// </remarks>
-        /// <seealso cref="PlayerMovementActions.AddCallbacks(IPlayerMovementActions)" />
-        /// <seealso cref="PlayerMovementActions.RemoveCallbacks(IPlayerMovementActions)" />
-        /// <seealso cref="PlayerMovementActions.UnregisterCallbacks(IPlayerMovementActions)" />
-        public void SetCallbacks(IPlayerMovementActions instance)
+        /// <seealso cref="PlayerActions.AddCallbacks(IPlayerActions)" />
+        /// <seealso cref="PlayerActions.RemoveCallbacks(IPlayerActions)" />
+        /// <seealso cref="PlayerActions.UnregisterCallbacks(IPlayerActions)" />
+        public void SetCallbacks(IPlayerActions instance)
         {
-            foreach (var item in m_Wrapper.m_PlayerMovementActionsCallbackInterfaces)
+            foreach (var item in m_Wrapper.m_PlayerActionsCallbackInterfaces)
                 UnregisterCallbacks(item);
-            m_Wrapper.m_PlayerMovementActionsCallbackInterfaces.Clear();
+            m_Wrapper.m_PlayerActionsCallbackInterfaces.Clear();
             AddCallbacks(instance);
         }
     }
     /// <summary>
-    /// Provides a new <see cref="PlayerMovementActions" /> instance referencing this action map.
+    /// Provides a new <see cref="PlayerActions" /> instance referencing this action map.
     /// </summary>
-    public PlayerMovementActions @PlayerMovement => new PlayerMovementActions(this);
+    public PlayerActions @Player => new PlayerActions(this);
 
-    // Camera Movement
-    private readonly InputActionMap m_CameraMovement;
-    private List<ICameraMovementActions> m_CameraMovementActionsCallbackInterfaces = new List<ICameraMovementActions>();
-    private readonly InputAction m_CameraMovement_Rotation;
+    // Camera
+    private readonly InputActionMap m_Camera;
+    private List<ICameraActions> m_CameraActionsCallbackInterfaces = new List<ICameraActions>();
+    private readonly InputAction m_Camera_Rotation;
     /// <summary>
-    /// Provides access to input actions defined in input action map "Camera Movement".
+    /// Provides access to input actions defined in input action map "Camera".
     /// </summary>
-    public struct CameraMovementActions
+    public struct CameraActions
     {
         private @InputSystem m_Wrapper;
 
         /// <summary>
         /// Construct a new instance of the input action map wrapper class.
         /// </summary>
-        public CameraMovementActions(@InputSystem wrapper) { m_Wrapper = wrapper; }
+        public CameraActions(@InputSystem wrapper) { m_Wrapper = wrapper; }
         /// <summary>
-        /// Provides access to the underlying input action "CameraMovement/Rotation".
+        /// Provides access to the underlying input action "Camera/Rotation".
         /// </summary>
-        public InputAction @Rotation => m_Wrapper.m_CameraMovement_Rotation;
+        public InputAction @Rotation => m_Wrapper.m_Camera_Rotation;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
-        public InputActionMap Get() { return m_Wrapper.m_CameraMovement; }
+        public InputActionMap Get() { return m_Wrapper.m_Camera; }
         /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
         public void Enable() { Get().Enable(); }
         /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Disable()" />
@@ -423,9 +423,9 @@ public partial class @InputSystem: IInputActionCollection2, IDisposable
         /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
         public bool enabled => Get().enabled;
         /// <summary>
-        /// Implicitly converts an <see ref="CameraMovementActions" /> to an <see ref="InputActionMap" /> instance.
+        /// Implicitly converts an <see ref="CameraActions" /> to an <see ref="InputActionMap" /> instance.
         /// </summary>
-        public static implicit operator InputActionMap(CameraMovementActions set) { return set.Get(); }
+        public static implicit operator InputActionMap(CameraActions set) { return set.Get(); }
         /// <summary>
         /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
         /// </summary>
@@ -433,11 +433,11 @@ public partial class @InputSystem: IInputActionCollection2, IDisposable
         /// <remarks>
         /// If <paramref name="instance" /> is <c>null</c> or <paramref name="instance"/> have already been added this method does nothing.
         /// </remarks>
-        /// <seealso cref="CameraMovementActions" />
-        public void AddCallbacks(ICameraMovementActions instance)
+        /// <seealso cref="CameraActions" />
+        public void AddCallbacks(ICameraActions instance)
         {
-            if (instance == null || m_Wrapper.m_CameraMovementActionsCallbackInterfaces.Contains(instance)) return;
-            m_Wrapper.m_CameraMovementActionsCallbackInterfaces.Add(instance);
+            if (instance == null || m_Wrapper.m_CameraActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_CameraActionsCallbackInterfaces.Add(instance);
             @Rotation.started += instance.OnRotation;
             @Rotation.performed += instance.OnRotation;
             @Rotation.canceled += instance.OnRotation;
@@ -449,8 +449,8 @@ public partial class @InputSystem: IInputActionCollection2, IDisposable
         /// <remarks>
         /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
         /// </remarks>
-        /// <seealso cref="CameraMovementActions" />
-        private void UnregisterCallbacks(ICameraMovementActions instance)
+        /// <seealso cref="CameraActions" />
+        private void UnregisterCallbacks(ICameraActions instance)
         {
             @Rotation.started -= instance.OnRotation;
             @Rotation.performed -= instance.OnRotation;
@@ -458,12 +458,12 @@ public partial class @InputSystem: IInputActionCollection2, IDisposable
         }
 
         /// <summary>
-        /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="CameraMovementActions.UnregisterCallbacks(ICameraMovementActions)" />.
+        /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="CameraActions.UnregisterCallbacks(ICameraActions)" />.
         /// </summary>
-        /// <seealso cref="CameraMovementActions.UnregisterCallbacks(ICameraMovementActions)" />
-        public void RemoveCallbacks(ICameraMovementActions instance)
+        /// <seealso cref="CameraActions.UnregisterCallbacks(ICameraActions)" />
+        public void RemoveCallbacks(ICameraActions instance)
         {
-            if (m_Wrapper.m_CameraMovementActionsCallbackInterfaces.Remove(instance))
+            if (m_Wrapper.m_CameraActionsCallbackInterfaces.Remove(instance))
                 UnregisterCallbacks(instance);
         }
 
@@ -473,27 +473,27 @@ public partial class @InputSystem: IInputActionCollection2, IDisposable
         /// <remarks>
         /// If <paramref name="instance" /> is <c>null</c>, calling this method will only unregister all existing callbacks but not register any new callbacks.
         /// </remarks>
-        /// <seealso cref="CameraMovementActions.AddCallbacks(ICameraMovementActions)" />
-        /// <seealso cref="CameraMovementActions.RemoveCallbacks(ICameraMovementActions)" />
-        /// <seealso cref="CameraMovementActions.UnregisterCallbacks(ICameraMovementActions)" />
-        public void SetCallbacks(ICameraMovementActions instance)
+        /// <seealso cref="CameraActions.AddCallbacks(ICameraActions)" />
+        /// <seealso cref="CameraActions.RemoveCallbacks(ICameraActions)" />
+        /// <seealso cref="CameraActions.UnregisterCallbacks(ICameraActions)" />
+        public void SetCallbacks(ICameraActions instance)
         {
-            foreach (var item in m_Wrapper.m_CameraMovementActionsCallbackInterfaces)
+            foreach (var item in m_Wrapper.m_CameraActionsCallbackInterfaces)
                 UnregisterCallbacks(item);
-            m_Wrapper.m_CameraMovementActionsCallbackInterfaces.Clear();
+            m_Wrapper.m_CameraActionsCallbackInterfaces.Clear();
             AddCallbacks(instance);
         }
     }
     /// <summary>
-    /// Provides a new <see cref="CameraMovementActions" /> instance referencing this action map.
+    /// Provides a new <see cref="CameraActions" /> instance referencing this action map.
     /// </summary>
-    public CameraMovementActions @CameraMovement => new CameraMovementActions(this);
+    public CameraActions @Camera => new CameraActions(this);
     /// <summary>
-    /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Player Movement" which allows adding and removing callbacks.
+    /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Player" which allows adding and removing callbacks.
     /// </summary>
-    /// <seealso cref="PlayerMovementActions.AddCallbacks(IPlayerMovementActions)" />
-    /// <seealso cref="PlayerMovementActions.RemoveCallbacks(IPlayerMovementActions)" />
-    public interface IPlayerMovementActions
+    /// <seealso cref="PlayerActions.AddCallbacks(IPlayerActions)" />
+    /// <seealso cref="PlayerActions.RemoveCallbacks(IPlayerActions)" />
+    public interface IPlayerActions
     {
         /// <summary>
         /// Method invoked when associated input action "Movement" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
@@ -504,11 +504,11 @@ public partial class @InputSystem: IInputActionCollection2, IDisposable
         void OnMovement(InputAction.CallbackContext context);
     }
     /// <summary>
-    /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Camera Movement" which allows adding and removing callbacks.
+    /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Camera" which allows adding and removing callbacks.
     /// </summary>
-    /// <seealso cref="CameraMovementActions.AddCallbacks(ICameraMovementActions)" />
-    /// <seealso cref="CameraMovementActions.RemoveCallbacks(ICameraMovementActions)" />
-    public interface ICameraMovementActions
+    /// <seealso cref="CameraActions.AddCallbacks(ICameraActions)" />
+    /// <seealso cref="CameraActions.RemoveCallbacks(ICameraActions)" />
+    public interface ICameraActions
     {
         /// <summary>
         /// Method invoked when associated input action "Rotation" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
