@@ -37,8 +37,6 @@ namespace CODE.Scripts.State.Machine.Activities
 			Mode = ActiveMode.Activating;
 			await Task.CompletedTask;
 			Mode = ActiveMode.Active;
-
-			Debug.Log($"Activated {GetType().Name} (mode={Mode})");
 		}
 
 		/// <summary>
@@ -57,8 +55,6 @@ namespace CODE.Scripts.State.Machine.Activities
 			Mode = ActiveMode.Deactivating;
 			await Task.CompletedTask;
 			Mode = ActiveMode.Inactive;
-
-			Debug.Log($"Deactivated {GetType().Name} (mode={Mode})");
 		}
 	}
 }

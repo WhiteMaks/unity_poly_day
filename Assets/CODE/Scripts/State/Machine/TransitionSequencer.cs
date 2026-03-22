@@ -22,7 +22,7 @@ namespace CODE.Scripts.State.Machine
 	{
 		private readonly StateMachine _stateMachine;
 
-		private readonly bool _useSequential = false;
+		private const bool UseSequential = true;
 
 		private ISequence _currentSequence;
 		private Action _nextPhase;
@@ -96,11 +96,9 @@ namespace CODE.Scripts.State.Machine
 		/// <summary>
 		/// Находит ближайшего общего предка двух состояний в дереве состояний.
 		/// </summary>
-
 		/// <param name="state1">Первое состояние для поиска общего предка.</param>
 		/// <param name="state2">Второе состояние для поиска общего предка.</param>
 		/// <returns>Общий предок, либо <c>null</c>, если общего предка нет.</returns>
-
 		public static BaseState FindCommonParent(BaseState state1, BaseState state2)
 		{
 			var tree = new HashSet<BaseState>();
@@ -147,7 +145,6 @@ namespace CODE.Scripts.State.Machine
 		/// <summary>
 		/// Формирует список шагов для активации активностей входящих состояний (enter-phase).
 		/// </summary>
-
 		private static List<PhaseStep> GetActivatePhaseSteps(List<BaseState> states)
 		{
 			var result = new List<PhaseStep>();
@@ -227,7 +224,6 @@ namespace CODE.Scripts.State.Machine
 		/// <summary>
 		/// Завершает текущую последовательность и, если есть отложенный переход, инициирует его.
 		/// </summary>
-
 		private void End()
 		{
 			_currentSequence = null;
@@ -250,7 +246,7 @@ namespace CODE.Scripts.State.Machine
 		/// </summary>
 		private ISequence GetPhaseSequence(List<PhaseStep> steps, CancellationToken token)
 		{
-			return _useSequential ? new SequentialPhaseSequence(steps, token) : new ParallelPhaseSequence(steps, token);
+			return UseSequential ? new SequentialPhaseSequence(steps, token) : new ParallelPhaseSequence(steps, token);
 		}
 	}
 }

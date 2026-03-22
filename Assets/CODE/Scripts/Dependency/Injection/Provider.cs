@@ -1,6 +1,5 @@
 ﻿using CODE.Scripts.Dependency.Injection.Attributes;
 using CODE.Scripts.Dependency.Injection.Interfaces;
-using CODE.Scripts.Services;
 using UnityEngine;
 
 namespace CODE.Scripts.Dependency.Injection
@@ -16,15 +15,5 @@ namespace CODE.Scripts.Dependency.Injection
 	/// </remarks>
 	public class Provider : MonoBehaviour, IDependencyProvider
 	{
-		/// <summary>
-		/// Пример метода-поставщика, помеченного атрибутом <see cref="ProvideAttribute"/>.
-		/// Возвращаемое значение будет зарегистрировано в реестре инжектора по типу <see cref="Service1"/>.
-		/// </summary>
-		/// <returns>Новый экземпляр <see cref="Service1"/>.</returns>
-		[Provide]
-		public Service1 ProvideService1()
-		{
-			return new Service1();
-		}
 	}
 }

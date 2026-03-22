@@ -1,10 +1,10 @@
 ﻿using System.Linq;
 using CODE.Scripts.Character;
-using CODE.Scripts.Dependency.Injection.Attributes;
+using CODE.Scripts.Character.States;
+using CODE.Scripts.Character.Systems;
+using CODE.Scripts.Core;
 using CODE.Scripts.Observer;
 using CODE.Scripts.Observer.Interfaces;
-using CODE.Scripts.Player.States;
-using CODE.Scripts.Services;
 using CODE.Scripts.Source;
 using CODE.Scripts.Source.Interfaces;
 using CODE.Scripts.State.Machine;
@@ -15,62 +15,48 @@ namespace CODE.Scripts.Player
 	public class PlayerController : MonoBehaviour, IStartObserver, IUpdateObserver, IFixedUpdateObserver
 	{
 		private IInputSource _inputSource;
+		private EventBus _eventBus;
 		private StateMachine _stateMachine;
 		private BaseState _rootSate;
-
-		[SerializeField] private CharacterContext context;
-		[SerializeField] private LayerMask groundMask;
-		[SerializeField] private Transform groundCheck;
-		private Rigidbody _rigidbody;
-
-		private const float GroundRadius = 0.6f;
-		private const bool DrawGizmos = true;
+		private CharacterPhysicsSystem _physicsSystem;
 
 		private string _lastPath;
 
-		[Inject] private Service1 _service1;
+		[SerializeField] private CharacterContext context;
+		[SerializeField] private CharacterView view;
 
 		public void CoreStart()
 		{
-			_service1.Initialize("Service 1 initialized in PlayerController");
-
-			_inputSource = new PlayerLocomotionInputSource();
+			_inputSource = new PlayerControllerInputSource();
 			_inputSource.Enable();
 
 			_inputSource.OnMove += OnMoveInput;
 			_inputSource.OnJump += OnJumpInput;
 
-			_rigidbody = gameObject.GetComponent<Rigidbody>();
-			_rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+			_eventBus = new EventBus();
 
-			context.rigidbody = _rigidbody;
-			context.animator = GetComponentInChildren<Animator>();
-
-			_rootSate = new PlayerRootState(_stateMachine, context);
+			_rootSate = new CharacterRootState(_stateMachine, context, _eventBus);
 			_stateMachine = new StateMachineBuilder(_rootSate).Build();
+
+			_physicsSystem = new CharacterPhysicsSystem(_eventBus, context, view);
+
+			view.rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
 		}
 
 		public void CoreUpdate()
 		{
-			context.grounded = Physics.CheckSphere(groundCheck.position, GroundRadius, groundMask);
-
 			_stateMachine.Update();
-
 			var path = StatePath(_stateMachine.GetRootState().GetDeepestChild());
 			if (path != _lastPath)
 			{
-				Debug.Log(path);
+				Debug.Log($"Current State: {path}");
 				_lastPath = path;
 			}
 		}
 
 		public void CoreFixedUpdate()
 		{
-			var velocity = _rigidbody.linearVelocity;
-			velocity.x = context.velocity.x;
-
-			_rigidbody.linearVelocity = velocity;
-			context.velocity.x = _rigidbody.linearVelocity.x;
+			_physicsSystem.FixedUpdate();
 		}
 
 		private static string StatePath(BaseState state)
@@ -78,25 +64,15 @@ namespace CODE.Scripts.Player
 			return string.Join(" > ", state.GetPathToRoot().Reverse().Select(s => s.GetType().Name));
 		}
 
-		private void OnDrawGizmosSelected()
-		{
-			if (!DrawGizmos || groundCheck == null)
-			{
-				return;
-			}
-
-			Gizmos.color = Color.white;
-			Gizmos.DrawWireSphere(groundCheck.position, GroundRadius);
-		}
-
 		private void OnMoveInput(Vector2 input)
 		{
-			context.move.x = Mathf.Clamp(input.x, -1.0f, 1.0f);
+			context.moveInput.x = Mathf.Clamp(input.x, -1.0f, 1.0f);
+			context.moveInput.y = Mathf.Clamp(input.y, -1.0f, 1.0f);
 		}
 
 		private void OnJumpInput()
 		{
-			context.jump = true;
+			context.jumpInput = true;
 		}
 
 		private void Awake()
@@ -108,7 +84,7 @@ namespace CODE.Scripts.Player
 
 		private void OnDisable()
 		{
-			_inputSource.Disable();
+			_inputSource?.Disable();
 		}
 	}
 }

@@ -28,7 +28,7 @@ namespace CODE.Scripts.State.Machine.Activities
 		/// Выполняет задержку, затем вызывает базовую реализацию <see cref="Activity.ActivateAsync"/>.
 		/// </summary>
 		/// <param name="token">Токен отмены для асинхронной операции.</param>
-	/// <returns>Задача, представляющая асинхронную операцию активации.</returns>
+		/// <returns>Задача, представляющая асинхронную операцию активации.</returns>
 		public override async Task ActivateAsync(CancellationToken token)
 		{
 			await Task.Delay(TimeSpan.FromSeconds(_seconds), token);

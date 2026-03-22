@@ -127,7 +127,6 @@ namespace CODE.Scripts.Dependency.Injection
 				}
 
 				injectableField.SetValue(behaviour, instance);
-				Debug.Log($"Injected {fieldType.Name} into {type.Name}");
 			}
 		}
 
@@ -176,7 +175,6 @@ namespace CODE.Scripts.Dependency.Injection
 				}
 
 				_registry.Add(returnType, providerInstance);
-				Debug.Log($"Registered {returnType.Name} from {provider.GetType().Name}");
 			}
 		}
 

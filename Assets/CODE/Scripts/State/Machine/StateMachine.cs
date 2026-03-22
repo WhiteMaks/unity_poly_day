@@ -31,7 +31,7 @@ namespace CODE.Scripts.State.Machine
 		/// Запускает машину состояний: устанавливает флаг начала и вызывает Enter у корневого состояния.
 		/// Вызов идемпотентен — повторный Start не повлияет на уже запущенную машину.
 		/// </summary>
-		public void Start()
+		private void Start()
 		{
 			if (_started)
 			{
